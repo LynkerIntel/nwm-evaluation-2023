@@ -10,10 +10,45 @@ g0 = ggplot(data = filter(data, GAGE_ID == 10244950)) +
   labs(x = "", y = "") +
   theme(axis.text = element_text(size =18))
 
-g1 = data.frame(
-  PET_Model     = c("Noah OWP", "Energy Balance",  "Aerodynamic", "Combined", "Priestley-Taylor", "Penman-Monteith"),
-  Aridity_ratio = c(.48,        .95,                1.02,          .85,        .82,                1.18)
-) %>% 
+
+g1 = readr::read_csv('data/ngen-experiment/Info_AllModels.csv') %>% 
+  select(Aridity_ratio, AridityNG, PET_Model,  GAGE_ID = ...1, A_Best1) %>% 
+  left_join(data) %>% 
+  filter(!is.na(PET_Model)) %>% 
+  mutate(#Aridity_ratio = ifelse(Aridity_ratio > 2, 2, Aridity_ratio),
+    my_ai_ratio= AridityNG / mean.ai,
+    #my_ai_ratio = ifelse(my_ai_ratio > 2, 2, my_ai_ratio)
+  ) %>% 
+  filter(!is.na(my_ai_ratio)) %>% 
+  group_by(GAGE_ID)  %>% 
+  mutate(my_best = ifelse(any(my_ai_ratio > 1), PET_Model[which(my_ai_ratio == min(my_ai_ratio[my_ai_ratio > .99]))], PET_Model[which.max(my_ai_ratio)])) %>% 
+  mutate(my_best = case_when(
+    my_best == 'NOAH' ~ "Noah OWP",
+    my_best == 'PET_1' ~ "Energy Balance",
+    my_best == 'PET_2' ~ "Aerodynamic",
+    my_best == 'PET_3' ~ "Combined",
+    my_best == 'PET_4' ~ "Priestley-Taylor",
+    my_best == 'PET_5' ~ "Penman-Monteith"
+  ),
+  PET_Model = case_when(
+    PET_Model == 'NOAH' ~ "Noah OWP",
+    PET_Model == 'PET_1' ~ "Energy Balance",
+    PET_Model == 'PET_2' ~ "Aerodynamic",
+    PET_Model == 'PET_3' ~ "Combined",
+    PET_Model == 'PET_4' ~ "Priestley-Taylor",
+    PET_Model == 'PET_5' ~ "Penman-Monteith"
+  ),
+  A_Best1 = case_when(
+    A_Best1 == 'NOAH' ~ "Noah OWP",
+    A_Best1 == 'PET_1' ~ "Energy Balance",
+    A_Best1 == 'PET_2' ~ "Aerodynamic",
+    A_Best1 == 'PET_3' ~ "Combined",
+    A_Best1 == 'PET_4' ~ "Priestley-Taylor",
+    A_Best1 == 'PET_5' ~ "Penman-Monteith"
+  )) %>% 
+  ungroup() %>% 
+  mutate(ring = ifelse(PET_Model == my_best, TRUE, FALSE)) %>% 
+  filter(GAGE_ID == 10244950)  %>% 
   ggplot() + 
   geom_col(aes(x = PET_Model, y = Aridity_ratio, fill = PET_Model)) + 
   geom_hline(yintercept = 1,size = 2) +
@@ -34,20 +69,7 @@ g1 = data.frame(
         plot.title = element_text(size=16,face="bold"))
 
 
-ngen_sims = read.csv('/Users/mjohnson/github/nwm-evaluation/fin/10244950_PET_2_CFE_X.csv') 
-
-ngen_sims$NWM20_cms =  nwmTools::readNWMdata(comid = 11339045, 
-                                             startDate = min(ngen_sims$time), 
-                                             endDate = max(ngen_sims$time), 
-                                             version = 2)$flow_cms_v2
-
-
-ngen_sims = mutate(ngen_sims,
-                   time = as.POSIXct(time),
-                   cumNG = cumsum(replace_na(q_cms_sim, 0))/10000,
-                   cumNWIS = cumsum(replace_na(q_cms_obs, 0))/10000,
-                   cumNWM = cumsum(replace_na(NWM20_cms, 0))/10000,
-                   )
+ngen_sims = arrow::read_parquet("data/ngen-experiment/obs_sim_retro20_flows_10244950.parquet")
 
 g2 = ggplot(data = ngen_sims) +
   geom_line(aes(x = time, y = cumNG , color = "NextGen Simulation"), size = 2) +

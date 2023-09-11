@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+private
+data/basins.gpkg
+data/tifs

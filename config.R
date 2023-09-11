@@ -13,7 +13,8 @@ pacman::p_load(
   rstatix,
   plyr,
   BAMMtools,
-  tidyr
+  tidyr,
+  arrow
 )
 
 options(warn=-1)
@@ -24,7 +25,7 @@ states  = aoi_get(state = 'conus') %>% st_transform(5070)
 conus   = st_union(states)
 conusbb = st_bbox(conus)
 
-data = readRDS("data/v20_summary_stats.rds") %>%
+data = read_parquet("data/v20_summary_stats.parquet") %>%
   mutate(nseb_tmp = ifelse(NSEB > 1 , 1, NSEB),
          nsec_tmp = ifelse(NSEC > 1 , 1, NSEC),
          Water = ifelse(is.na(LU_1),  0, LU_1),
