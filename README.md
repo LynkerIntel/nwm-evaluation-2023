@@ -46,7 +46,7 @@ _J. Michael Johnson, Shiqi Fang, A.Sankarasubramanian, Arash Modaresi Rad, Lucia
 
 # Key Data Artifacts
   The key artifacts used in the analysis of this paper are:
-    - `data/v20_summary_stats.rds` - this is the basins.gpkg stripped of geometry and saved as a parquet file 
+    - `data/v20_summary_stats.parquet` - this is the basins.gpkg stripped of geometry and saved as a parquet file 
 
 # Create all images 
 
