@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/688631492.svg)](https://zenodo.org/doi/10.5281/zenodo.10080618)
+
 Code and data for manuscript submitted to **JGR: Atmospheres**
 
 ## **Comprehensive analysis of the NOAA National Water Model: A call for heterogeneous formulations and diagnostic model selection**
