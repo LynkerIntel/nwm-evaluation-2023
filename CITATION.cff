@@ -1,0 +1,11 @@
+cff-version: 1.1.0
+message: "If you use this software or data, please cite it as below."
+authors:
+- family-names: Johnson
+  given-names: J.M.
+orcid: https://orcid.org/0000-0002-5288-8350
+title: "Analysis Code and Data for Comprehensive analysis of the NOAA National Water Model: A call for heterogeneous formulations and diagnostic model selection
+version: v1.0
+doi: 10.5281/zenodo.10080619
+date-released: 2023-11-07
+url: "https://github.com/LynkerIntel/nwm-evaluation-2023"
